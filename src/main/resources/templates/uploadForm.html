@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org">
+   <style>
+    body {
+	background-color: rgba(13, 148, 210, .09);
+	display: block;
+	margin: 0px;
+}
+
+td {
+	border: 1px solid #999999;
+	text-align: left;
+	padding: 8px;
+	border-style: none;
+	border-color: #7bc143;
+}
+
+tr:nth-child(even) {
+	background-color: rgba(13, 148, 210, .09);
+	;
+}
+
+tr:nth-child(odd) {
+	background-color: #7bc143;
+}
+
+th {
+	background-color: #7bc143;
+	color: white;
+}
+
+.title {
+	text-align
+}
+
+.topnav {
+	background-color: rgba(13, 148, 210, .09);
+}
+
+.header {
+	font-family: arial, sans-serif;
+	display: block;
+	color: #ffffff;
+	text-align: center;
+	background: #7bc143;
+	padding: 14px 16px;
+	text-decoration: none;
+	font-size: 17px;
+	padding: 1em;
+	text-align: center;
+	display: inline-block;
+	text-decoration: none !important;
+	margin: 0 auto;
+	-webkit-transition: all 0.2s ease-in-out;
+	-moz-transition: all 0.2s ease-in-out;
+	-ms-transition: all 0.2s ease-in-out;
+	-o-transition: all 0.2s ease-in-out;
+	transition: all 0.2s ease-in-out;
+}
+
+.dropbtn:hover {
+	background-color: rgb(76, 175, 80);
+	color: black;
+}
+
+.redclass {
+	color: red;
+}
+
+.greenclass {
+	color: green;
+}
+
+.loading {
+	width: 150px;
+	height: 150px;
+}
+
+.yellowclass {
+	color: yellow;
+}
+
+.left {
+	background-color: rgba(33, 149, 243, 0.705);
+	width: 30%;
+	float: left;
+	overflow: auto;
+}
+
+.innerTable {
+	width: auto;
+	overflow: auto;
+	margin: auto;
+}
+
+.table-div {
+	display: inline-block;
+	width: 40%;
+}
+
+.right {
+	background-color: rgba(33, 149, 243, 0.705);
+	float: right;
+	width: 30%;
+	overflow: auto;
+}
+
+.center {
+	margin: 0 auto;
+	text-align: center;
+}
+   </style>
+   <html>
+      <head>
+         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      </head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <body>
+         <div style="background-color: #7bc143;" id="banner" class="center">
+            <a href="" class="header"> Databag Creation Tool </a>
+         </div>
+         <br />
+         <div id="container-div center">
+            <div class="left center" id="_statusPage">
+               <p></p>
+               <p>status:</p>
+            </div>
+            <div id="table-div" class="table-div">
+               <table align="center" class="topnav innerTable">
+                  <td>Secret</td>
+                  <td>Existing files: 
+                     <select id= "secret-selection">
+                     </select>
+                  </td>
+                  <td>
+                     <form id="submit-form">
+                        <input type="file" id="uploadedFile" name="file"></input>
+                        <input type="button" id="submitButton"></input>
+                  </td>
+                  <td>
+                  <button type="button" id="clearBtn"> Clear </button>
+                  </td>
+                  </form>
+                  <tr>
+                  </tr>
+                  <td>JSON</td>
+                  <td id="last-uploaded-file">Last upload: </td>
+                  <td>
+                     <form id="submit-form-json">
+                     <input type="file" id="uploadedFile-json" name="file"></input>
+                     <input type="button" id="submitButton-json"></input>
+                  </td>
+                  <td>
+                     <button type="button" id="execScriptButton"> Submit </button>
+                  </td>
+			   </table>
+			   <center>
+					<iframe id="terminal" width="400px" height="100px" class="center" src="https://localhost:4200" frameBorder="0"></iframe>
+			   </center>
+            </div>
+            <div class="right center" id="_resultPage">
+               <p></p>
+               <p>result:</p>
+            </div>
+         </div>
+         <!-- code here -->
+      </body>
+      <div style="border:1px #7bc143">
+      </div>
+      <div id="footer-div" class="jjson" style="
+         text-align: center;
+         position: relative;
+         z-index: 10;
+         height: 3em;
+         margin-top: 0em;
+         clear: both;
+         ">
+		 <!-- footer code here-->
+      </div>
+   </html>
+   <script>
+	function statusMessage(text, color) {
+		var elementID = document.createElement("p");
+		elementID.innerHTML = text.toString();
+		elementID.setAttribute("id", "delete");
+		document.getElementById("_statusPage").appendChild(elementID);
+
+		if (color === "red") {
+			elementID.setAttribute("class", "redclass");
+		} else if (color === "green") {
+			elementID.setAttribute("class", "greenclass");
+		} else if (color === "yellow") {
+			elementID.setAttribute("class", "yellowclass");
+		}
+		// auto scrolling
+		var element = document.getElementById("_statusPage");
+		element.scrollTop = element.scrollHeight;
+	}
+
+	function deleteChildren(parent) {
+		while (isDelete(parent)) {
+			for (var i = 0; i < parent.childElementCount; i++) {
+				if (parent.children[i].getAttribute("id") == "delete") {
+					parent.children[i].remove();
+					deleteChildren(parent);
+				}
+			}
+		}
+
+	}
+
+	function isDelete(parent) {
+		for (var i = 0; i < parent.childElementCount; i++) {
+			if (parent.children[i].getAttribute("id") == "delete") {
+				return true;
+			}
+		}
+	}
+
+	function resultMessage(text, color) {
+		var elementID = document.createElement("p");
+		elementID.innerHTML = text.toString();
+		elementID.setAttribute("id", "delete");
+		document.getElementById("_resultPage").appendChild(elementID);
+
+		if (color === "red") {
+			elementID.setAttribute("class", "redclass");
+		} else if (color === "green") {
+			elementID.setAttribute("class", "greenclass");
+		} else if (color === "yellow") {
+			elementID.setAttribute("class", "yellowclass");
+		}
+		// auto scrolling
+		var element = document.getElementById("_statusPage");
+		element.scrollTop = element.scrollHeight;
+	}
+
+	$(document).ready(function () {
+		// for getting existing secret files
+		$.ajax({
+			type: "GET",
+			url: "existingFiles",
+			contentType: "application/json; charset=utf-8",
+			data: {
+				"blank": "blank"
+			},
+			success: function (data) {
+				parse_info(data);
+			},
+			error: function (xhr) {
+				statusMessage(`Ajax call to /existingFiles has returned ${xhr.status}, error is: ${xhr.toString()}`);
+			}
+		})
+
+		$("#submitButton")[0].value = "Upload";
+		$("#submitButton-json")[0].value = "Upload";
+
+		// for handling the click for the upload secret part
+		$("#submitButton").bind("click", function () {
+			var file = $("#uploadedFile")[0];
+
+			if (file.files.length === 0 || file.files.length > 1) {
+				statusMessage("Upload or select an existing secret file from the drop-down menu. Only 1 file upload is permitted.", "red");
+			} else if (file.files.length === 1) {
+				statusMessage("sending file to /secrets..", "green");
+				var form = $("#submit-form")[0];
+
+				//sending file to /secrets
+				var data = new FormData(form);
+
+				$.ajax({
+					url: 'secrets',
+					enctype: "multipart/form-data",
+					data: data,
+					cache: false,
+					contentType: false,
+					processData: false,
+					method: 'POST',
+					type: 'POST',
+					success: function (data) {
+						var value = document.getElementById("uploadedFile").value;
+						var to_add = document.createElement("option");
+						to_add.innerText = value.substring(value.lastIndexOf("\\", value.length) + 1);
+						document.getElementById("secret-selection").appendChild(to_add);
+						statusMessage("recieved data from /secrets: " + data.toString(), "green");
+					}
+				})
+
+			}
+		});
+
+
+		$("#submitButton-json").bind("click", function () {
+			var file = $("#uploadedFile-json")[0];
+
+			if (file.files.length === 0 || file.files.length > 1) {
+				statusMessage("Upload or use the last json file. Only 1 file upload is permitted.", "red");
+			} else if (file.files.length === 1) {
+				statusMessage("sending file to /uploadJSON..", "green");
+
+				var form = $("#submit-form-json")[0];
+
+				//sending file to /uploadJSON
+				var data = new FormData(form);
+
+				$.ajax({
+					url: 'uploadJSON',
+					enctype: "multipart/form-data",
+					data: data,
+					cache: false,
+					contentType: false,
+					processData: false,
+					method: 'POST',
+					type: 'POST',
+					success: function (data) {
+						statusMessage("recieved data from /uploadJSON: " + data.toString(), "green");
+
+						if (!$("#last-uploaded-file")[0].innerText.includes(data.toString())) {
+							$("#last-uploaded-file")[0].innerText += ` ${data.toString()}`;
+						}
+					}
+				})
+
+			}
+		});
+
+	});
+
+	$("#clearBtn").bind("click", function () {
+
+		if ($("#footer-div")[0].childElementCount != 0) {
+			for (var i = 0; i < $("#footer-div")[0].childElementCount; i++) {
+				if ($("#footer-div")[0].children[i].getAttribute("id") == "loading") {
+					$("#footer-div")[0].children[i].remove();
+				}
+			}
+		}
+
+		var left = $("#_statusPage")[0];
+		var right = $("#_resultPage")[0];
+
+		deleteChildren(left);
+		deleteChildren(right);
+
+	});
+
+
+	$("#execScriptButton").bind("click", function () {
+
+		var name_of_secret = $("#secret-selection")[0].value;
+		var name_of_json = $("#last-uploaded-file")[0].innerText.substring(13, $("#last-uploaded-file")[0].innerText.length);
+
+		console.log(`to submit: ${name_of_secret} and ${name_of_json}`);
+
+		var data = {
+			name_of_secret,
+			name_of_json
+		};
+
+		var loading_gif = document.createElement("img");
+		loading_gif.setAttribute("id", "loading");
+		loading_gif.setAttribute("src", "loading.gif");
+		loading_gif.setAttribute("class", "loading");
+
+		if ($("#footer-div")[0].childElementCount == 0) {
+			$("#footer-div")[0].appendChild(loading_gif);
+		}
+
+		statusMessage("creating databag...", "green");
+
+		$.ajax({
+			url: 'executeScript',
+			data: JSON.stringify(data),
+			contentType: "application/json",
+			method: 'POST',
+			type: 'POST',
+			success: function (data) {
+				for (var i = 0; i < $("#footer-div")[0].childElementCount; i++) {
+				if ($("#footer-div")[0].children[i].getAttribute("id") == "loading") {
+						$("#footer-div")[0].children[i].remove();
+					}
+				}
+				resultMessage(`${JSON.stringify(data, null, '\t')}`, "green");
+			},
+			error: function (xhr) {
+				statusMessage("Please try again, unexpected response has been recieved", "yellow");
+				for (var i = 0; i < $("#footer-div")[0].childElementCount; i++) {
+				if ($("#footer-div")[0].children[i].getAttribute("id") == "loading") {
+						$("#footer-div")[0].children[i].remove();
+					}
+				}
+			}
+		})
+	});
+
+	function parse_info(data) {
+		for (var i = 0; i < data.length; i++) {
+			var name = data[i].substring(data[i].lastIndexOf("/") + 1);
+			$("#secret-selection").append(`<option> ${name} </option>`);
+		}
+	}
+   </script>
